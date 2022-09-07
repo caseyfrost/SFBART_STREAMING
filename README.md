@@ -9,16 +9,21 @@ The data for SFBART delays and lines comes from [(GTFS)](https://developers.goog
 The data is streamed via python and kafka, transformed via python and ksqldb, and stored via python, kafka connect, and postgres.
 
 ## How it works
-The yaml file is configured to create the standard services required to stand up a kafka, ksqldb, and postgres environment. Those configurations are well documented online so I will not go over them here. The custom images are the interesting part of how the application works and do require some explanation. The application starts with the BART GTFS producer and the Twitter producer. 
+The yaml file is configured to create the standard services required to stand up a kafka, ksqldb, and postgres environment. Those configurations are well documented online so I will not go over them here. The custom images are the interesting part of how the application works and do require some explanation. 
+
+The application starts with the BART GTFS producer and the Twitter producer. The GTFS producer takes the real time feed from BART's GTFS API, normalized the nested json response into a flatter structure, and adds additional details to the data from BART's static GTFS files. The real time feed provides coded information for the station name, a trip_id, and the delay information. The aditional details provided by the static files are the full name of the stops and the lines the real time trip is on. To combine this data I needed to take the trip_id from the real time data, and scan the static data for that corresponding ID. The GTFS producer script then takes the message and adds it to a kafka topic. The twitter producer simply creates a stream that is searching for tweets related to BART delays and adds them to a kafka topic.
+
+Next, ksqldb is used to create the window function to find the average delay by line. First, the ksqldb script takes the kafka topics with json messages from the producers and creates new avro streams with schemas. The schemas are necessary for the Postgres sink connectors. 
 
 
 ## Requirements
 1. Docker
-2. Twitter Developer App and associated keys
-3. Terminal or Command Prompt
+2. Twitter developer account/app and associated keys
+3. Static GTFS files
 
 ## Steps to run on your own
 
 
 ## Futre enhancements
+
 
