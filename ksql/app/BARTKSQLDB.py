@@ -8,28 +8,33 @@ from ksql import KSQLAPI
 class BARTKSQLDBTable(object):
 
     def __init__(self):
-        self.client = KSQLAPI('http://primary-ksqldb-server:8088', timeout=1200)
+        self.client = KSQLAPI('http://primary-ksqldb-server:8088', timeout=1200)  # connects to the ksqldb container's api
 
     def create_stream(self):
+        # converts producer topic to a stream
         self.client.ksql("CREATE OR REPLACE STREAM BART_GTFS_STREAM (id VARCHAR KEY, trip_id VARCHAR, "
                          "delay BIGINT, stop_name VARCHAR, headsign STRING) WITH ("
                          "kafka_topic='BART_Trips_Normalized', value_format='json')")
 
     def create_tweet_stream(self):
+        # converts producer topic to a stream
         self.client.ksql("CREATE OR REPLACE STREAM BART_TWEETS_STREAM (TWEET_ID BIGINT KEY, CREATED_DATE TIMESTAMP, "
                          "TWEET_TEXT STRING) WITH (kafka_topic='BART_TWEETS', value_format='json')")
 
     def create_avro_stream(self):
+        # converts stream to an avro stream so there is a schema
         self.client.ksql("CREATE OR REPLACE STREAM BART_STREAM_AVRO WITH (VALUE_FORMAT='AVRO', "
                          "KAFKA_TOPIC='BART_STREAM_AVRO') AS SELECT * FROM BART_GTFS_STREAM")
 
     def create_tweet_avro_stream(self):
+        # converts stream to an avro stream so there is a schema
         self.client.ksql("CREATE OR REPLACE STREAM BART_TWEET_STREAM_AVRO WITH (VALUE_FORMAT='AVRO', "
                          "KAFKA_TOPIC='BART_TWEETS_STREAM_AVRO') AS SELECT * FROM BART_TWEETS_STREAM")
 
     def create_table(self):
-        tables = self.client.ksql("SHOW TABLES;")
-        if "BART_DELAYS" not in tables[0]['tables']:
+        # Window function to create hopping windows and aggregate the delay values by line
+        tables = self.client.ksql("SHOW TABLES;")  # query ksql for existing tables
+        if "BART_DELAYS" not in tables[0]['tables']:  # if the table already exists do not try and create it again
             self.client.ksql("CREATE TABLE BART_DELAYS WITH (KAFKA_TOPIC='BART_DELAYS', VALUE_FORMAT='AVRO') AS SELECT "
                              "headsign, TOPK(headsign, 1) AS headsign_col, AVG(delay) AS delay, from_unixtime("
                              "WINDOWSTART) as Window_Start, from_unixtime(WINDOWEND) as Window_End, from_unixtime(MAX("
@@ -37,8 +42,9 @@ class BARTKSQLDBTable(object):
                              "15 MINUTES, RETENTION 1 DAYS, GRACE PERIOD 30 MINUTES) GROUP BY headsign EMIT CHANGES")
 
     def create_delay_postgres_sink(self):
+        # create the sink connector to stream the data to postgres
         connectors = self.client.ksql("SHOW CONNECTORS;")
-        if "BART_DELAYS_01" not in connectors[0]['connectors']:
+        if "BART_DELAYS_01" not in connectors[0]['connectors']:  # if the connector already exists do not try and create it
             self.client.ksql("CREATE SINK CONNECTOR BART_DELAYS_01 WITH ("
                              "'connector.class'='io.confluent.connect.jdbc.JdbcSinkConnector',"
                              "'connection.url'='jdbc:postgresql://postgres:5432/default_database?user=postgres&password"
@@ -51,8 +57,9 @@ class BARTKSQLDBTable(object):
                              "'table.name.format'='${topic}-01');")
 
     def create_tweet_postgres_sink(self):
+        # create the sink connector to stream the data to postgres
         connectors = self.client.ksql("SHOW CONNECTORS;")
-        if "BART_TWEETS_01" not in connectors[0]['connectors']:
+        if "BART_TWEETS_01" not in connectors[0]['connectors']:  # if the connector already exists do not try and create it
             self.client.ksql("CREATE SINK CONNECTOR BART_TWEETS_01 WITH ("
                              "'connector.class'='io.confluent.connect.jdbc.JdbcSinkConnector',"
                              "'connection.url'='jdbc:postgresql://postgres:5432/default_database?user=postgres&password"
@@ -67,6 +74,7 @@ class BARTKSQLDBTable(object):
                              "'table.name.format'='${topic}-01');")
 
     def query(self):
+        # A sanity check to see if SFBART real time data is being streamed
         q = self.client.query("SELECT * FROM BART_DELAYS EMIT CHANGES")
         for r in q:
             print(r)
@@ -83,7 +91,7 @@ class BARTKSQLDBTable(object):
         time.sleep(10)
         self.create_delay_postgres_sink()
         self.create_tweet_postgres_sink()
-        self.query()
+        self.query()  # sanity check
 
 
 def main():
