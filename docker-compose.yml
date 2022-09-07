@@ -147,19 +147,19 @@ services:
 
 
   # other services
-  bart-producer:
+  bart_gtfs_producer:
     image: bart-producer:latest
     container_name: bart-producer
     depends_on:
       - kafka
 
-  bart-twitter-producer:
+  bart_twitter_producer:
     image: bart-twitter-producer:latest
     container_name: bart-twitter-producer
     depends_on:
       - kafka
 
-  bart-ksql:
+  bart_ksql:
     image: bart-ksql:latest
     container_name: bart-ksql
     depends_on:
