@@ -17,7 +17,7 @@ class BARTKSQLDBTable(object):
 
     def create_tweet_stream(self):
         self.client.ksql("CREATE OR REPLACE STREAM BART_TWEETS_STREAM (TWEET_ID BIGINT KEY, CREATED_DATE TIMESTAMP, "
-                         "TWEET_TEXT STRING) WITH (kafka_topic='BART_TWEETS_STREAM', value_format='json')")
+                         "TWEET_TEXT STRING) WITH (kafka_topic='BART_TWEETS', value_format='json')")
 
     def create_avro_stream(self):
         self.client.ksql("CREATE OR REPLACE STREAM BART_STREAM_AVRO WITH (VALUE_FORMAT='AVRO', "
