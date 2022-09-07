@@ -29,12 +29,13 @@ After all of that the data is streaming directly from Twitter and BART's GTFS fe
 1. Download the repo to your personal computer
 2. Download the latest trips and stops txt files from [https://www.bart.gov/dev/schedules/google_transit.zip](https://www.bart.gov/dev/schedules/google_transit.zip)
 3. Replace the existing stop and trips txt files in \bart_gtfs_producer\app\ with your newly downloaded files
-4. Add your Twitter app API keys to config file
+4. Add your Twitter app API keys to twitter_producer\app\config.py file
 4. Start Docker on your computer
 5. Build bart_gtfs_producer, ksql, and twitter_producer by navigating to those directorie and running: docker build -t {name of directory}:latest -f Dockerfile app
 6. Navigate to the SFBART_STREAMING directory and run: docker-compose up --scale additional-ksqldb-server=0
 7. Here I have had difficulties if the ksqldb server does not start fully or the kafka connect server does not start fully. If either do not start fully you will need to restart their containers. I think I need to build a health check here that waits for kafka to be fully running.
-8. Wait for 
+8. Wait for the kafka connect logs to indicate the sink connectors were created.
+9. Open the Postgres CLI, switch to the default_database, and inspect the two new tables
 
 
 ## Future enhancements
