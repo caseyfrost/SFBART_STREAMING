@@ -40,4 +40,5 @@ After all of that the data is streaming directly from Twitter and BART's GTFS fe
 
 ## Future enhancements
 1. Health check for kafka server, ksqldb server, and kafka connect server
+2. Shell script to restart containers that do not start properly
 
