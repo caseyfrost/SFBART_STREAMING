@@ -1,0 +1,6 @@
+access_token = '210205203-cGtRZgBuDwicEwKAVxicFtawr0WOBVCKBEY6mw2G'
+access_token_secret = '1dKrFmsxwxLI23SFfiEnlU6ZiyA9fxM7muYigP8KGMzft'
+consumer_key = 'gSC4fVWgNpmxEpMDi2cr8Aeqm'
+consumer_secret = 'T0mQlnu3yeD4FRKtMfm0Nvw1YnJR2Ra1oUAZeZYpxrBK5JK60L'
+db_con_str = 'postgresql://postgres:5432/default_database?user=postgres&password'
+bearer_token = 'AAAAAAAAAAAAAAAAAAAAAJyLdwEAAAAAuafS0cCRWFSYRrvc0TPT1vjqb68%3D16yCliL30bTwQZLG56ZgILTZG2wNIegkQPzHdIyuEKA6bmxxZr'
