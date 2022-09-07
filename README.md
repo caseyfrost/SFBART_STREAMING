@@ -9,13 +9,13 @@ The data for SFBART delays and lines comes from [(GTFS)](https://developers.goog
 The data is streamed via python and kafka, transformed via python and ksqldb, and stored via python, kafka connect, and postgres.
 
 ## How it works
-The yaml file is configured to create the standard services required to stand up a kafka, ksqldb, and postgres environment. Those configurations are well documented online and I do not need to go over them here. The interesting containers 
-
+The yaml file is configured to create the standard services required to stand up a kafka, ksqldb, and postgres environment. Those configurations are well documented online so I will not go over them here. The custom images are the interesting part of how the application works and do require some explanation. The application starts with the BART GTFS producer and the Twitter producer. 
 
 
 ## Requirements
 1. Docker
 2. Twitter Developer App and associated keys
+3. Terminal or Command Prompt
 
 ## Steps to run on your own
 
