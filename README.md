@@ -26,7 +26,9 @@ After all of that the data is streaming directly from Twitter and BART's GTFS fe
 3. Static GTFS files
 
 ## Steps to run on your own
-1. 
+1. Download the repo to your personal computer
+2. Download the latest trips and stops txt files from [https://www.bart.gov/dev/schedules/google_transit.zip](https://www.bart.gov/dev/schedules/google_transit.zip)
+3. Replace the existing stop and trips txt files in 
 
 
 ## Futre enhancements
