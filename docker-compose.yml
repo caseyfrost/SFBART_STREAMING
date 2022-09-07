@@ -159,7 +159,7 @@ services:
     depends_on:
       - kafka
 
-  bart_ksql:
+  ksql:
     image: bart-ksql:latest
     container_name: bart-ksql
     depends_on:
