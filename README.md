@@ -13,7 +13,11 @@ The yaml file is configured to create the standard services required to stand up
 
 The application starts with the BART GTFS producer and the Twitter producer. The GTFS producer takes the real time feed from BART's GTFS API, normalized the nested json response into a flatter structure, and adds additional details to the data from BART's static GTFS files. The real time feed provides coded information for the station name, a trip_id, and the delay information. The aditional details provided by the static files are the full name of the stops and the lines the real time trip is on. To combine this data I needed to take the trip_id from the real time data, and scan the static data for that corresponding ID. The GTFS producer script then takes the message and adds it to a kafka topic. The twitter producer simply creates a stream that is searching for tweets related to BART delays and adds them to a kafka topic.
 
-Next, ksqldb is used to create the window function to find the average delay by line. First, the ksqldb script takes the kafka topics with json messages from the producers and creates new avro streams with schemas. The schemas are necessary for the Postgres sink connectors. 
+Next, ksqldb and a python library called ksql is used to create the window function to find the average delay by line. The python library ksql allows my script to send commands to ksql's api. First, the ksqldb script takes the kafka topics with json messages from the producers and creates new avro streams with schemas. The schemas are necessary for the Postgres sink connectors. At this point the twitter stream is ready for the Postgres sink connector but the BART GTFS data still needs more manipulation. The next step is to take the BART GTFS stream and convert it into a talbe using a window function. The script uses a hopping window query to create hour long windows 15 minutes apart and find the average delay for each line within those windows. 
+
+Finally, the data is sent to postgres via Postgres sink connectors. The ksqldb script creates two sink connectors. One for the Twitter data, and one for the BART GTFS data. The BART GTFS data does not use the record_key configuration because the window function adds non UTF-8 characaters to the kafka message key.
+
+After all of that the data is streaming directly from Twitter and BART's GTFS feed into your Postgres database!
 
 
 ## Requirements
@@ -22,6 +26,7 @@ Next, ksqldb is used to create the window function to find the average delay by 
 3. Static GTFS files
 
 ## Steps to run on your own
+1. 
 
 
 ## Futre enhancements
